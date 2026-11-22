@@ -11,6 +11,8 @@ app = Flask(__name__, template_folder=os.path.join(BASE_DIR, "templates"))
 model = None
 if os.path.exists(MODEL_PATH):
     model = joblib.load(MODEL_PATH)
+    if not hasattr(model, "multi_class"):
+        model.multi_class = "auto"
     print(f"✓ Successfully loaded trained model from {MODEL_PATH}")
 else:
     print(f"⚠ Warning: {MODEL_PATH} not found. Please train and save the model first.")
@@ -64,6 +66,9 @@ def predict():
     sample_df = pd.DataFrame([[sl, sw, pl, pw]], columns=FEATURE_NAMES)
 
     try:
+        if not hasattr(model, "multi_class"):
+            model.multi_class = "auto"
+
         # Predict class index
         pred_idx = int(model.predict(sample_df)[0])
         predicted_species = TARGET_NAMES[pred_idx]
